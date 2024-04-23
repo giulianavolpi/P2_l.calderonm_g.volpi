@@ -3,48 +3,6 @@
 import sys
 import heapq
 
-# def dijkstra(graph, start):
-#     distances = {node: float('inf') for node in graph}
-#     distances[start] = 0
-#     pq = [(0, start)]  # Tupla (distancia_actual, nodo)
-#     while pq:
-#         current_distance, current_node = heapq.heappop(pq)
-#         if current_distance > distances[current_node]:
-#             continue
-#         for neighbor, weight in graph[current_node].items():
-#             distance = current_distance + weight
-#             if distance < distances[neighbor]:
-#                 distances[neighbor] = distance
-#                 heapq.heappush(pq, (distance, neighbor))
-
-#     return distances
-
-
-# def dijkstra_algorithm(graph, start_node):
-#     unvisited_nodes = list(graph.get_nodes())  
-#     shortest_path = {}
-#     previous_nodes = {} 
-#     max_value = sys.maxsize
-#     for node in unvisited_nodes:
-#         shortest_path[node] = max_value 
-#     shortest_path[start_node] = 0
-#     while unvisited_nodes:
-#         current_min_node = None
-#         for node in unvisited_nodes: # Iterate over the nodes
-#             if current_min_node == None:
-#                 current_min_node = node
-#             elif shortest_path[node] < shortest_path[current_min_node]:
-#                 current_min_node = node
-#         neighbors = graph.get_outgoing_edges(current_min_node)
-#         for neighbor in neighbors:
-#             tentative_value = shortest_path[current_min_node] + graph.value(current_min_node, neighbor)
-#             if tentative_value < shortest_path[neighbor]:
-#                 shortest_path[neighbor] = tentative_value
-#                 previous_nodes[neighbor] = current_min_node
-#         unvisited_nodes.remove(current_min_node)
-    
-#     return previous_nodes, shortest_path
-
 
 def crear_grafo(parejas):
     grafo = {}
@@ -60,6 +18,41 @@ def crear_grafo(parejas):
 def mostrar_grafo(grafo):
     for nodo, adyacentes in grafo.items():
         print(f"{nodo}: {list(adyacentes)}")
+        
+def obtener_numeros_unicos(parejas):
+
+    numeros_unicos = set()
+    for a, b in parejas:
+        numeros_unicos.add(a)
+        numeros_unicos.add(-a)
+        numeros_unicos.add(b)
+        numeros_unicos.add(-b)
+
+    lista_numeros_unicos = list(numeros_unicos)
+    lista_numeros_unicos.sort()
+
+    return lista_numeros_unicos
+
+def calcular_matriz_energia(lista_numeros_unicos, w1, w2):
+ 
+    tam = len(lista_numeros_unicos)
+    costos = [[0 for _ in range(tam)] for _ in range(tam)]
+
+    for i in range(tam):
+        for j in range(tam):
+            m1 = lista_numeros_unicos[i]
+            m2 = lista_numeros_unicos[j]
+            c1 = 1 if m1 >= 0 else -1
+            c2 = 1 if m2 >= 0 else -1
+            
+            if c1 == c2:
+                ltp = 1 + abs(m1 - m2) % w1
+            else:
+                ltp = w2 - abs(m1 - m2) % w2
+            
+            costos[i][j] = ltp
+            
+    return costos
 
 def encontrar_camino_euleriano(grafo):
 
@@ -85,6 +78,43 @@ def encontrar_camino_euleriano(grafo):
     camino_parejas = [(path[i], path[i+1]) for i in range(len(path) - 1)]
     return camino_parejas
 
+def dijkstra(matriz_energia, lista_numeros_unicos, camino_parejas):
+    def get_index(num):
+        return lista_numeros_unicos.index(num)
+
+    caminos = []  # Almacenará los caminos entre cada par de parejas del camino euleriano
+    
+    # Realiza el algoritmo de Dijkstra para cada pareja del camino euleriano
+    for i in range(len(camino_parejas) - 1):
+        inicio = get_index(camino_parejas[i][1])
+        final = get_index(-camino_parejas[i+1][0])
+        
+        # Distancias iniciales son infinitas
+        distancias = [float('inf')] * len(lista_numeros_unicos)
+        distancias[inicio] = 0  # La distancia al nodo inicial es cero
+        
+        # El heap de prioridad almacenará (costo, nodo_actual, camino)
+        heap = [(0, inicio, [lista_numeros_unicos[inicio]])]
+        
+        while heap:
+            (costo, nodo_actual, camino) = heapq.heappop(heap)
+            
+            if nodo_actual == final:
+                caminos.append(camino)  # Añade el camino encontrado a la lista de caminos
+                break
+
+            for vecino in range(len(lista_numeros_unicos)):
+                if vecino != nodo_actual:  # Evita la autolocalización
+                    nuevo_costo = costo + matriz_energia[nodo_actual][vecino]
+                    
+                    if nuevo_costo < distancias[vecino]:
+                        distancias[vecino] = nuevo_costo
+                        # Pone en el heap el nuevo costo, el vecino y el camino actualizado
+                        heapq.heappush(heap, (nuevo_costo, vecino, camino + [lista_numeros_unicos[vecino]]))
+                    
+    return caminos
+
+
 
 
 
@@ -103,12 +133,23 @@ def main():
 
         grafo = crear_grafo(parejas)
         
+        
         camino = encontrar_camino_euleriano(grafo)
         print(f"Camino Euleriano: {camino}")
+        if camino is None:
+            print("No se encontró camino euleriano")
+        else: 
         
-
-        print(f"Grafo del Caso {caso}:")
-        mostrar_grafo(grafo)
+            unicos = obtener_numeros_unicos(parejas)
+            print(f"Números únicos: {unicos}")
+            
+            costos = calcular_matriz_energia(unicos, w1, w2)
+            print(f"Costos: {costos}")
+            
+            ruta = dijkstra(costos, unicos, camino)
+            print(f"Rutas: {ruta}")
+ 
+        
 
 if __name__ == "__main__":
     main()
