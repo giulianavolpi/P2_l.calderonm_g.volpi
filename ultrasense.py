@@ -34,30 +34,30 @@ def obtener_numeros_unicos(parejas):
     return lista_numeros_unicos
 
 def calcular_matriz_energia(lista_numeros_unicos, w1, w2):
- 
     tam = len(lista_numeros_unicos)
-    costos = [[0 for _ in range(tam)] for _ in range(tam)]
+    costos = [[float('inf') for _ in range(tam)] for _ in range(tam)] 
 
     for i in range(tam):
         for j in range(tam):
-            m1 = lista_numeros_unicos[i]
-            m2 = lista_numeros_unicos[j]
-            c1 = 1 if m1 >= 0 else -1
-            c2 = 1 if m2 >= 0 else -1
-            
-            if c1 == c2:
-                ltp = 1 + abs(m1 - m2) % w1
-            else:
-                ltp = w2 - abs(m1 - m2) % w2
-            
-            costos[i][j] = ltp
-            
+            if i != j:  
+                m1 = lista_numeros_unicos[i]
+                m2 = lista_numeros_unicos[j]
+                c1 = 1 if m1 >= 0 else -1
+                c2 = 1 if m2 >= 0 else -1
+
+                if m1 == -m2:
+                    continue 
+                if c1 == c2:
+                    ltp = 1 + abs(m1 - m2) % w1
+                else:
+                    ltp = w2 - abs(m1 - m2) % w2
+
+                costos[i][j] = ltp
+
     return costos
 
 def encontrar_camino_euleriano(grafo):
-
     nodos_impar = [nodo for nodo, vecinos in grafo.items() if len(vecinos) % 2 != 0]
-    
     if len(nodos_impar) not in [0, 2]:
         return None
 
@@ -67,7 +67,6 @@ def encontrar_camino_euleriano(grafo):
 
     while stack:
         vertex = stack[-1]
-   
         if not grafo[vertex]:
             path.append(stack.pop())
         else:
@@ -79,37 +78,28 @@ def encontrar_camino_euleriano(grafo):
     return camino_parejas
 
 def dijkstra(matriz_energia, lista_numeros_unicos, camino_parejas):
+    caminos = []  
+
     def get_index(num):
         return lista_numeros_unicos.index(num)
 
-    caminos = []  # Almacenará los caminos entre cada par de parejas del camino euleriano
-    
-    # Realiza el algoritmo de Dijkstra para cada pareja del camino euleriano
     for i in range(len(camino_parejas) - 1):
         inicio = get_index(camino_parejas[i][1])
         final = get_index(-camino_parejas[i+1][0])
-        
-        # Distancias iniciales son infinitas
         distancias = [float('inf')] * len(lista_numeros_unicos)
-        distancias[inicio] = 0  # La distancia al nodo inicial es cero
-        
-        # El heap de prioridad almacenará (costo, nodo_actual, camino)
+        distancias[inicio] = 0  
         heap = [(0, inicio, [lista_numeros_unicos[inicio]])]
         
         while heap:
             (costo, nodo_actual, camino) = heapq.heappop(heap)
-            
             if nodo_actual == final:
-                caminos.append(camino)  # Añade el camino encontrado a la lista de caminos
+                caminos.append(camino)  
                 break
-
             for vecino in range(len(lista_numeros_unicos)):
-                if vecino != nodo_actual:  # Evita la autolocalización
+                if vecino != nodo_actual:  
                     nuevo_costo = costo + matriz_energia[nodo_actual][vecino]
-                    
                     if nuevo_costo < distancias[vecino]:
                         distancias[vecino] = nuevo_costo
-                        # Pone en el heap el nuevo costo, el vecino y el camino actualizado
                         heapq.heappush(heap, (nuevo_costo, vecino, camino + [lista_numeros_unicos[vecino]]))
                     
     return caminos
