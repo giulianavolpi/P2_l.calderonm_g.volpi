@@ -79,6 +79,7 @@ def encontrar_camino_euleriano(grafo):
 
 def dijkstra(matriz_energia, lista_numeros_unicos, camino_parejas):
     caminos = []  
+    total_ltp = 0  # Variable para acumular el costo total de los caminos
 
     def get_index(num):
         return lista_numeros_unicos.index(num)
@@ -94,18 +95,16 @@ def dijkstra(matriz_energia, lista_numeros_unicos, camino_parejas):
             (costo, nodo_actual, camino) = heapq.heappop(heap)
             if nodo_actual == final:
                 caminos.append(camino)  
+                total_ltp += costo  # Acumula el costo para el camino actual
                 break
             for vecino in range(len(lista_numeros_unicos)):
-                if vecino != nodo_actual:  
+                if vecino != nodo_actual:
                     nuevo_costo = costo + matriz_energia[nodo_actual][vecino]
                     if nuevo_costo < distancias[vecino]:
                         distancias[vecino] = nuevo_costo
                         heapq.heappush(heap, (nuevo_costo, vecino, camino + [lista_numeros_unicos[vecino]]))
                     
-    return caminos
-
-
-
+    return caminos, total_ltp
 
 
 
@@ -122,23 +121,20 @@ def main():
         print(f"Parejas: {parejas}")
 
         grafo = crear_grafo(parejas)
-        
-        
         camino = encontrar_camino_euleriano(grafo)
         print(f"Camino Euleriano: {camino}")
         if camino is None:
             print("No se encontró camino euleriano")
-        else: 
-        
+        else:
             unicos = obtener_numeros_unicos(parejas)
             print(f"Números únicos: {unicos}")
             
             costos = calcular_matriz_energia(unicos, w1, w2)
             print(f"Costos: {costos}")
             
-            ruta = dijkstra(costos, unicos, camino)
+            ruta, total_ltp = dijkstra(costos, unicos, camino)
             print(f"Rutas: {ruta}")
- 
+            print(f"LTP Total utilizado: {total_ltp}")
         
 
 if __name__ == "__main__":
