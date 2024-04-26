@@ -33,26 +33,29 @@ def obtener_numeros_unicos(parejas):
 
     return lista_numeros_unicos
 
+
 def calcular_matriz_energia(lista_numeros_unicos, w1, w2):
     tam = len(lista_numeros_unicos)
     costos = [[float('inf') for _ in range(tam)] for _ in range(tam)] 
 
     for i in range(tam):
         for j in range(tam):
-            if i != j:  
-                m1 = lista_numeros_unicos[i]
-                m2 = lista_numeros_unicos[j]
-                c1 = 1 if m1 >= 0 else -1
-                c2 = 1 if m2 >= 0 else -1
+            m1 = lista_numeros_unicos[i]
+            m2 = lista_numeros_unicos[j]
+            
+            # Si son el mismo número o números opuestos, mantenemos el costo como infinito
+            if m1 == m2 or m1 == -m2:
+                continue
 
-                if m1 == -m2:
-                    continue 
-                if c1 == c2:
-                    ltp = 1 + abs(m1 - m2) % w1
-                else:
-                    ltp = w2 - abs(m1 - m2) % w2
+            c1 = 1 if m1 >= 0 else -1
+            c2 = 1 if m2 >= 0 else -1
 
-                costos[i][j] = ltp
+            if c1 == c2:
+                ltp = 1 + abs(abs(m1) - abs(m2)) % w1
+            else:
+                ltp = w2 - abs(abs(m1) - abs(m2)) % w2
+
+            costos[i][j] = ltp
 
     return costos
 
