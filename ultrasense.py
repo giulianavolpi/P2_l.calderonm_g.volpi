@@ -76,8 +76,13 @@ def encontrar_camino_euleriano(grafo):
             next_vertex = grafo[vertex].pop()
             grafo[next_vertex].remove(vertex)
             stack.append(next_vertex)
+            
+    for vecinos in grafo.values():
+        if vecinos:
+            return None
 
     camino_parejas = [(path[i], path[i+1]) for i in range(len(path) - 1)]
+    
     return camino_parejas
 
 def dijkstra(matriz_energia, lista_numeros_unicos, camino_parejas):
