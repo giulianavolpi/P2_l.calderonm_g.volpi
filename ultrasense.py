@@ -125,22 +125,22 @@ def main():
         print(f"n={n}, w1={w1}, w2={w2}")
 
         parejas = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(n)]
-        print(f"Parejas: {parejas}")
+        #print(f"Parejas: {parejas}")
 
         grafo = crear_grafo(parejas)
         camino = encontrar_camino_euleriano(grafo)
-        print(f"Camino Euleriano: {camino}")
+        #print(f"Camino Euleriano: {camino}")
         if camino is None:
             print("No se encontró camino euleriano")
         else:
             unicos = obtener_numeros_unicos(parejas)
-            print(f"Números únicos: {unicos}")
+            #print(f"Números únicos: {unicos}")
             
             costos = calcular_matriz_energia(unicos, w1, w2)
-            print(f"Costos: {costos}")
+            #print(f"Costos: {costos}")
             
             ruta, total_ltp = dijkstra(costos, unicos, camino)
-            print(f"Rutas: {ruta}")
+            #print(f"Rutas: {ruta}")
             print(f"LTP Total utilizado: {total_ltp}")
         
 
