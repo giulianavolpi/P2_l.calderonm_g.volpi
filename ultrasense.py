@@ -42,8 +42,7 @@ def calcular_matriz_energia(lista_numeros_unicos, w1, w2):
         for j in range(tam):
             m1 = lista_numeros_unicos[i]
             m2 = lista_numeros_unicos[j]
-            
-            # Si son el mismo número o números opuestos, mantenemos el costo como infinito
+
             if m1 == m2 or m1 == -m2:
                 continue
 
@@ -64,30 +63,30 @@ def encontrar_camino_euleriano(grafo):
     if len(nodos_impar) not in [0, 2]:
         return None
 
-    start_vertex = nodos_impar[0] if len(nodos_impar) == 2 else next(iter(grafo)) 
-    stack = [start_vertex]
-    path = []
+    vert_inicio = nodos_impar[0] if len(nodos_impar) == 2 else next(iter(grafo)) 
+    pila = [vert_inicio]
+    camino = []
 
-    while stack:
-        vertex = stack[-1]
-        if not grafo[vertex]:
-            path.append(stack.pop())
+    while pila:
+        vert = pila[-1]
+        if not grafo[vert]:
+            camino.append(pila.pop())
         else:
-            next_vertex = grafo[vertex].pop()
-            grafo[next_vertex].remove(vertex)
-            stack.append(next_vertex)
+            vert_siguiente = grafo[vert].pop()
+            grafo[vert_siguiente].remove(vert)
+            pila.append(vert_siguiente)
             
     for vecinos in grafo.values():
         if vecinos:
             return None
 
-    camino_parejas = [(path[i], path[i+1]) for i in range(len(path) - 1)]
+    camino_parejas = [(camino[i], camino[i+1]) for i in range(len(camino) - 1)]
     
     return camino_parejas
 
 def dijkstra(matriz_energia, lista_numeros_unicos, camino_parejas):
     caminos = []  
-    total_ltp = 0  # Variable para acumular el costo total de los caminos
+    total_ltp = 0  
 
     def get_index(num):
         return lista_numeros_unicos.index(num)
@@ -103,7 +102,7 @@ def dijkstra(matriz_energia, lista_numeros_unicos, camino_parejas):
             (costo, nodo_actual, camino) = heapq.heappop(heap)
             if nodo_actual == final:
                 caminos.append(camino)  
-                total_ltp += costo  # Acumula el costo para el camino actual
+                total_ltp += costo
                 break
             for vecino in range(len(lista_numeros_unicos)):
                 if vecino != nodo_actual:
