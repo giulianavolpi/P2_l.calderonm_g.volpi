@@ -115,27 +115,30 @@ def dijkstra(matriz_energia, lista_numeros_unicos, camino_parejas):
 
 
 
-
 def main():
     num_casos = int(sys.stdin.readline().strip())
     print(f"Cantidad de casos: {num_casos}")
 
     for caso in range(1, num_casos + 1):
         n, w1, w2 = map(int, sys.stdin.readline().strip().split())
-        output = f"Caso {caso}: n={n}, w1={w1}, w2={w2}"
-
         parejas = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(n)]
         grafo = crear_grafo(parejas)
         camino = encontrar_camino_euleriano(grafo)
+
         if camino is None:
-            output += " No se encontró camino euleriano"
-        else:
-            unicos = obtener_numeros_unicos(parejas)
-            costos = calcular_matriz_energia(unicos, w1, w2)
-            ruta, total_ltp = dijkstra(costos, unicos, camino)
-            output += f" LTP Total utilizado: {total_ltp}, Parejas: {parejas}, Ruta: {ruta}, Costo total: {total_ltp}"
-        print(output)
+            print(f"Caso {caso}: No se encontró camino euleriano")
+            continue
+
+        unicos = obtener_numeros_unicos(parejas)
+        costos = calcular_matriz_energia(unicos, w1, w2)
+        rutas, total_ltp = dijkstra(costos, unicos, camino)
+
+        print(f"Caso {caso}: n={n}, w1={w1}, w2={w2}")
+        resultado = []
+        for i, ruta in enumerate(rutas):
+            if i < len(camino) - 1:
+                resultado.append(f"({camino[i][0]},{camino[i][1]}),{','.join(map(str, ruta))}")
+        print(",".join(resultado) + f" {total_ltp}")
 
 if __name__ == "__main__":
     main()
-
