@@ -115,34 +115,26 @@ def dijkstra(matriz_energia, lista_numeros_unicos, camino_parejas):
 
 
 
+
 def main():
     num_casos = int(sys.stdin.readline().strip())
     print(f"Cantidad de casos: {num_casos}")
 
     for caso in range(1, num_casos + 1):
         n, w1, w2 = map(int, sys.stdin.readline().strip().split())
-        print(f"\nCaso {caso}:")
-        print(f"n={n}, w1={w1}, w2={w2}")
+        output = f"Caso {caso}: n={n}, w1={w1}, w2={w2}"
 
         parejas = [tuple(map(int, sys.stdin.readline().strip().split())) for _ in range(n)]
-        #print(f"Parejas: {parejas}")
-
         grafo = crear_grafo(parejas)
         camino = encontrar_camino_euleriano(grafo)
-        #print(f"Camino Euleriano: {camino}")
         if camino is None:
-            print("No se encontró camino euleriano")
+            output += " No se encontró camino euleriano"
         else:
             unicos = obtener_numeros_unicos(parejas)
-            #print(f"Números únicos: {unicos}")
-            
             costos = calcular_matriz_energia(unicos, w1, w2)
-            #print(f"Costos: {costos}")
-            
             ruta, total_ltp = dijkstra(costos, unicos, camino)
-            #print(f"Rutas: {ruta}")
-            print(f"LTP Total utilizado: {total_ltp}")
-        
+            output += f" LTP Total utilizado: {total_ltp}, Parejas: {parejas}, Ruta: {ruta}, Costo total: {total_ltp}"
+        print(output)
 
 if __name__ == "__main__":
     main()
